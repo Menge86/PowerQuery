@@ -1,0 +1,16 @@
+(tbl) =>
+let
+    Headers = Table.ColumnNames(tbl),
+
+    fnMyAccumulator =
+        (tbl as table, columnName as text) as table =>
+            if List.MatchesAll(Table.Column(tbl, columnName), each _ is null) then Table.RemoveColumns(tbl, {columnName}) else tbl,
+    
+    myAccumulatedResult = List.Accumulate(
+        Headers,
+        tbl,
+        (tbl, columnName) => fnMyAccumulator(tbl, columnName))
+in
+    myAccumulatedResult
+    
+    ##https://datachant.com/2016/12/09/remove-empty-columns-rows-from-table-in-excel-power-query-2/
