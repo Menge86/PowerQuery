@@ -1,0 +1,35 @@
+(Capital as number , Interes as number, Pagos as number) =>
+
+let
+
+ P=Capital,  
+ i=Interes,  
+ n=Pagos,  
+
+ Mes=Table.ExpandRecordColumn(  
+     Table.FromList(  
+           List.Generate(  
+           ()=>[Counter=1],  
+           each [Counter]<=n,  
+           each [Counter=[Counter]+1]  
+           ),  
+     Splitter.SplitByNothing(), {"Balance Inicial"},   
+    null, ExtraValues.Error),"Balance Inicial", {"Counter"}, {"Mes"}),  
+
+   BalanceInicial = Table.AddColumn(Mes, "Balance Inicial",   
+     each P*(Number.Power(1+(i/12),n)-Number.Power(1+(i/12),[Mes]-1))/(Number.Power(1+(i/12),n)-1),   
+     type number),  
+
+   PagoMensual = Table.AddColumn(BalanceInicial, "Pago Mensual",   
+     each P*((i/12)*Number.Power(1+(i/12),n))/(Number.Power(1+(i/12),n)-1), type number),  
+
+   InteresMensual=Table.AddColumn(PagoMensual , "Interes Mensual",   
+     each (i/12)*[Balance Inicial], type number),  
+
+   CapitalMensual = Table.AddColumn(InteresMensual, "Capital Mensual",   
+     each [Pago Mensual]-[Interes Mensual], type number),  
+
+   BalanceFinal = Table.AddColumn(CapitalMensual, "Balance Final",   
+     each [Balance Inicial]-[Capital Mensual], type number)  
+ in  
+   BalanceFinal
